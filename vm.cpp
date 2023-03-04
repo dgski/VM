@@ -32,7 +32,7 @@ enum SystemCalls {
   PUTC
 };
 
-int8_t getValue(int8_t instruction, int bit, int widthInBits)
+uint8_t getValue(uint8_t instruction, int bit, int widthInBits)
 {
   const uint8_t mask = ~(~uint8_t(0) << widthInBits);
   instruction >>= bit;
@@ -40,17 +40,17 @@ int8_t getValue(int8_t instruction, int bit, int widthInBits)
 }
 
 struct SourceAndDestinations {
-  int8_t source;
-  int8_t destination;
+  uint8_t source;
+  uint8_t destination;
 };
-SourceAndDestinations getRegisterOperands(int8_t rawInstruction)
+SourceAndDestinations getRegisterOperands(uint8_t rawInstruction)
 {
   const auto destination = getValue(rawInstruction, 1, 2);
   const auto source = getValue(rawInstruction, 3, 2);
   return { source, destination };
 }
 
-void updateFlag(ConditionFlag& conditionalFlag, int8_t registerValue)
+void updateFlag(ConditionFlag& conditionalFlag, uint8_t registerValue)
 {
   if (registerValue > 0) {
     conditionalFlag = ConditionFlag::Positive;
@@ -61,7 +61,7 @@ void updateFlag(ConditionFlag& conditionalFlag, int8_t registerValue)
   }
 }
 
-void loadProgramFileIntoMemory(int8_t memory[], const char* pathToProgramFile)
+void loadProgramFileIntoMemory(uint8_t memory[], const char* pathToProgramFile)
 {
   int i = 0;
   std::ifstream file(pathToProgramFile);
@@ -70,22 +70,22 @@ void loadProgramFileIntoMemory(int8_t memory[], const char* pathToProgramFile)
   }
 }
 
-int8_t getRawInstruction(int8_t memory[], int8_t address)
+uint8_t getRawInstruction(uint8_t memory[], uint8_t address)
 {
   return memory[address];
 }
 
-Instruction getOperation(int8_t rawInstruction)
+Instruction getOperation(uint8_t rawInstruction)
 {
-  return Instruction(getValue(rawInstruction, 4, 3));
+  return Instruction(getValue(rawInstruction, 5, 3));
 }
 
-SystemCalls getSystemCall(int8_t rawInstruction)
+SystemCalls getSystemCall(uint8_t rawInstruction)
 {
   return SystemCalls(getValue(rawInstruction, 0, 5));
 }
 
-void handleSystemCall(bool& running, int8_t& r0, int8_t rawInstruction)
+void handleSystemCall(bool& running, uint8_t& r0, uint8_t rawInstruction)
 {
   const auto systemCall = getSystemCall(rawInstruction);
   switch (systemCall) {
@@ -100,7 +100,7 @@ void handleSystemCall(bool& running, int8_t& r0, int8_t rawInstruction)
   }
 }
 
-void handleNextInstruction(bool& running, int8_t memory[], int8_t registers[], ConditionFlag& conditionalFlag)
+void handleNextInstruction(bool& running, uint8_t memory[], uint8_t registers[], ConditionFlag& conditionalFlag)
 {
   const auto rawInstruction = getRawInstruction(memory, registers[Register::ProgramControl]++);
   const auto operation = getOperation(rawInstruction);
@@ -108,7 +108,7 @@ void handleNextInstruction(bool& running, int8_t memory[], int8_t registers[], C
   case READ: {
     const auto destination = getValue(rawInstruction, 3, 2);
     const auto offset = getValue(rawInstruction, 0, 3);
-    const auto value = registers[destination] = memory[registers[Register::ProgramControl] + offset];
+    registers[destination] = memory[registers[Register::ProgramControl] + offset];
     break;
   }
   case LOAD: {
@@ -163,8 +163,8 @@ int main(int argc, const char** argv)
     return EXIT_FAILURE;
   }
 
-  int8_t memory[1 << 8] = { 0 };
-  int8_t registers[1 << 3] = { 0 };
+  uint8_t memory[1 << 8] = { 0 };
+  uint8_t registers[1 << 3] = { 0 };
   ConditionFlag conditionalFlag = ConditionFlag::Zero;
 
   const char* pathToProgramFile = argv[1];
