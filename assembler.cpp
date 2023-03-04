@@ -73,9 +73,35 @@ LabelsAndData getLabelsAndData(const char* inputAssemblyFilePath)
   return result;
 }
 
-std::vector<char> generateMachineCode(const char* inputAssemblyFilePath, const LabelsAndData& labelsAndData)
+uint8_t createInstruction(std::string_view one, std::string_view two, std::string_view three)
 {
-  return {};
+  return 0;
+}
+
+std::vector<uint8_t> generateMachineCode(const char* inputAssemblyFilePath, const LabelsAndData& labelsAndData)
+{
+  std::vector<uint8_t> result;
+
+  int currentMemoryAddress = 0;
+  std::string line;
+  std::ifstream assemblyFileStream(inputAssemblyFilePath);
+  while (std::getline(assemblyFileStream, line)) {
+    if (line.empty()) {
+      continue;
+    }
+
+    if (auto [one, two, three] = splitLine(line, ' '); isInstruction(one)) {
+      result.push_back(createInstruction(one, two, three));
+    } else if (isData(one)) {
+      result.push_back(static_cast<uint8_t>(std::stoi(std::string(two))));
+      ++currentMemoryAddress;
+      continue;
+    } else /*isLabel*/ {
+      continue;
+    }
+  }
+
+  return result;
 }
 
 int main(int argc, const char** argv)
