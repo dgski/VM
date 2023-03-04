@@ -80,11 +80,9 @@ LabelsAndData getLabelsAndData(const char* inputAssemblyFilePath)
 
 uint8_t createInstruction(int currentMemoryAddress, std::string_view instruction, std::string_view operandOne, std::string_view operandTwo, const LabelsAndData& labelsAndData)
 {
-  std::cout << "instruction=" << instruction << " operandOne=" << operandOne << " operandTwo=" << operandTwo << std::endl;
 
   if (instruction == "READ") {
     const int8_t operandValue = isData(operandOne) ? (labelsAndData.dataToAddress.at(std::string(operandOne)) - currentMemoryAddress) : static_cast<int8_t>(std::stoi(std::string(operandOne)));
-    std::cout << "operandValue=" << int16_t(operandValue) << std::endl;
     return setInstruction(Instruction::READ) | setSignedValue(operandValue, 0, 5);
   } else if (instruction == "LOAD") {
     return setInstruction(Instruction::LOAD) | setRegisters(getRegister(operandOne), getRegister(operandTwo));
@@ -96,11 +94,7 @@ uint8_t createInstruction(int currentMemoryAddress, std::string_view instruction
     return setInstruction(Instruction::ADD) | setRegisters(getRegister(operandOne), getRegister(operandTwo));
   } else if (instruction == "JG") {
     const int8_t operandValue = isLabel(operandOne) ? (labelsAndData.labelToAddress.at(std::string(operandOne)) - currentMemoryAddress) : static_cast<int8_t>(std::stoi(std::string(operandOne)));
-    std::cout << "currentMemoryAddress=" << currentMemoryAddress << " creating jump to " << int16_t(operandValue) << std::endl;
     const auto jumpInstruction = setInstruction(Instruction::JG) | setSignedValue(operandValue, 0, 5);
-
-    std::cout << "jumpInstruction=" << std::bitset<8>(jumpInstruction) << std::endl;
-
     return jumpInstruction;
   } else if (instruction == "SYS") {
     const auto syscall = [&]() {
@@ -132,7 +126,6 @@ std::vector<uint8_t> generateMachineCode(
 
     if (auto [one, two, three] = splitLine(line, ' '); isInstruction(one)) {
       const auto machineInstruction = createInstruction(currentMemoryAddress++, one, two, three, labelsAndData);
-      std::cout << "machineInstruction=" << uint16_t(machineInstruction) << std::endl;
       result.push_back(machineInstruction);
     } else if (isData(one)) {
       const auto datum = isData(two) ? labelsAndData.dataToAddress.at(std::string(two)) : static_cast<int8_t>(std::stoi(std::string(two)));
@@ -158,15 +151,6 @@ int main(int argc, const char** argv)
   const char* bytecodeOutputFilePath = argv[2];
 
   const auto labelsAndData = getLabelsAndData(inputAssemblyFilePath);
-
-  for (auto [label, value] : labelsAndData.labelToAddress) {
-    std::cout << label << ":" << value << std::endl;
-  }
-
-  for (auto [data, value] : labelsAndData.dataToAddress) {
-    std::cout << data << ":" << value << std::endl;
-  }
-
   const auto machineCode = generateMachineCode(inputAssemblyFilePath, labelsAndData);
 
   std::ofstream outputFile(bytecodeOutputFilePath, std::ios::out | std::ios::binary);
