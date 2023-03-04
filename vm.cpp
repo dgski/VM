@@ -22,7 +22,6 @@ enum Instruction {
   STORE,
   COPY,
   ADD,
-  SUB,
   JG,
   SYS
 };
@@ -106,9 +105,8 @@ void handleNextInstruction(bool& running, uint8_t memory[], uint8_t registers[],
   const auto operation = getOperation(rawInstruction);
   switch (operation) {
   case READ: {
-    const auto destination = getValue(rawInstruction, 3, 2);
-    const auto offset = getValue(rawInstruction, 0, 3);
-    registers[destination] = memory[registers[Register::ProgramControl] + offset];
+    const auto offset = getValue(rawInstruction, 0, 5);
+    registers[Register::R0] = memory[registers[Register::ProgramControl] + offset];
     break;
   }
   case LOAD: {
@@ -136,12 +134,6 @@ void handleNextInstruction(bool& running, uint8_t memory[], uint8_t registers[],
     updateFlag(conditionalFlag, registers[destination]);
     break;
   }
-  case SUB: {
-    const auto [source, destination] = getRegisterOperands(rawInstruction);
-    registers[destination] -= registers[source];
-    updateFlag(conditionalFlag, registers[destination]);
-    break;
-  }
   case JG: {
     const auto programControlOffset = getValue(rawInstruction, 0, 5);
     if (conditionalFlag == ConditionFlag::Positive) {
@@ -163,8 +155,10 @@ int main(int argc, const char** argv)
     return EXIT_FAILURE;
   }
 
-  uint8_t memory[1 << 8] = { 0 };
-  uint8_t registers[1 << 3] = { 0 };
+  constexpr auto TOTAL_MEMORY_ADDRESSES = (1 << 8);
+  constexpr auto TOTAL_REGISTER_COUNT = (1 << 2);
+  uint8_t memory[TOTAL_MEMORY_ADDRESSES] = { 0 };
+  uint8_t registers[TOTAL_REGISTER_COUNT] = { 0 };
   ConditionFlag conditionalFlag = ConditionFlag::Zero;
 
   const char* pathToProgramFile = argv[1];
