@@ -83,7 +83,7 @@ uint8_t createInstruction(int currentMemoryAddress, std::string_view instruction
   std::cout << "instruction=" << instruction << " operandOne=" << operandOne << " operandTwo=" << operandTwo << std::endl;
 
   if (instruction == "READ") {
-    const int8_t operandValue = isData(operandOne) ? (labelsAndData.dataToAddress.at(std::string(operandOne)) - currentMemoryAddress) : static_cast<uint8_t>(std::stoi(std::string(operandOne)));
+    const int8_t operandValue = isData(operandOne) ? (labelsAndData.dataToAddress.at(std::string(operandOne)) - currentMemoryAddress) : static_cast<int8_t>(std::stoi(std::string(operandOne)));
     std::cout << "operandValue=" << int16_t(operandValue) << std::endl;
     return setInstruction(Instruction::READ) | setSignedValue(operandValue, 0, 5);
   } else if (instruction == "LOAD") {
@@ -95,7 +95,7 @@ uint8_t createInstruction(int currentMemoryAddress, std::string_view instruction
   } else if (instruction == "ADD") {
     return setInstruction(Instruction::ADD) | setRegisters(getRegister(operandOne), getRegister(operandTwo));
   } else if (instruction == "JG") {
-    const int8_t operandValue = isLabel(operandOne) ? (labelsAndData.labelToAddress.at(std::string(operandOne)) - currentMemoryAddress) : static_cast<uint8_t>(std::stoi(std::string(operandOne)));
+    const int8_t operandValue = isLabel(operandOne) ? (labelsAndData.labelToAddress.at(std::string(operandOne)) - currentMemoryAddress) : static_cast<int8_t>(std::stoi(std::string(operandOne)));
     std::cout << "currentMemoryAddress=" << currentMemoryAddress << " creating jump to " << int16_t(operandValue) << std::endl;
     const auto jumpInstruction = setInstruction(Instruction::JG) | setSignedValue(operandValue, 0, 5);
 
@@ -135,7 +135,7 @@ std::vector<uint8_t> generateMachineCode(
       std::cout << "machineInstruction=" << uint16_t(machineInstruction) << std::endl;
       result.push_back(machineInstruction);
     } else if (isData(one)) {
-      const auto datum = isData(two) ? labelsAndData.dataToAddress.at(std::string(two)) : static_cast<uint8_t>(std::stoi(std::string(two)));
+      const auto datum = isData(two) ? labelsAndData.dataToAddress.at(std::string(two)) : static_cast<int8_t>(std::stoi(std::string(two)));
       result.push_back(datum);
       ++currentMemoryAddress;
       continue;

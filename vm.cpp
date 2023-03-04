@@ -119,7 +119,7 @@ void handleNextInstruction(
   }
   case ADD: {
     const auto [source, destination] = getRegisterOperands(rawInstruction);
-    registers[destination] += registers[source];
+    registers[destination] += int8_t(registers[source]);
     updateFlag(conditionalFlag, registers[destination]);
     break;
   }
