@@ -12,6 +12,8 @@
 - **ADD x, y**: Add value in register y to value in register x and store result in register x
 - **SUB x, y**: Subtract value in register y from value in register x and store result in register
 - **JG x**: Add offset of x to PC if previous instruction result result was greater than 0
+- **SYS x**: Executes system call with id x. By convention R0 is used as an argument.
+    - **PUTC**: Output character value stored at r0 to stdout.
 
 ## TODO
 - [] Learning:
