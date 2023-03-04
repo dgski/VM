@@ -1,1 +1,1 @@
-HALT
+SYS HALT

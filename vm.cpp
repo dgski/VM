@@ -3,40 +3,13 @@
 #include <sstream>
 #include <vector>
 
+#include "shared.hpp"
+
 enum class ConditionFlag {
   Negative,
   Zero,
   Positive
 };
-
-enum Register {
-  R0,
-  R1,
-  R2,
-  ProgramControl
-};
-
-enum Instruction {
-  READ,
-  LOAD,
-  STORE,
-  COPY,
-  ADD,
-  JG,
-  SYS
-};
-
-enum SystemCalls {
-  HALT,
-  PUTC
-};
-
-uint8_t getValue(uint8_t instruction, int bit, int widthInBits)
-{
-  const uint8_t mask = ~(~uint8_t(0) << widthInBits);
-  instruction >>= bit;
-  return instruction & mask;
-}
 
 struct SourceAndDestinations {
   uint8_t source;
@@ -69,10 +42,7 @@ void loadProgramFileIntoMemory(uint8_t memory[], const char* pathToProgramFile)
   }
 }
 
-uint8_t getRawInstruction(uint8_t memory[], uint8_t address)
-{
-  return memory[address];
-}
+uint8_t getRawInstruction(uint8_t memory[], uint8_t address) { return memory[address]; }
 
 Instruction getOperation(uint8_t rawInstruction)
 {
@@ -99,7 +69,8 @@ void handleSystemCall(bool& running, uint8_t& r0, uint8_t rawInstruction)
   }
 }
 
-void handleNextInstruction(bool& running, uint8_t memory[], uint8_t registers[], ConditionFlag& conditionalFlag)
+void handleNextInstruction(
+  bool& running, uint8_t memory[], uint8_t registers[], ConditionFlag& conditionalFlag)
 {
   const auto rawInstruction = getRawInstruction(memory, registers[Register::ProgramControl]++);
   const auto operation = getOperation(rawInstruction);
