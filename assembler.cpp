@@ -68,11 +68,10 @@ LabelsAndData getLabelsAndData(const char* inputAssemblyFilePath)
 
     if (auto [one, two, three] = splitLine(line, ' '); isInstruction(one)) {
       ++currentMemoryAddress;
-      continue;
     } else if (isData(one)) {
       result.dataToAddress[std::string(one)] = currentMemoryAddress++;
     } else /*isLabel*/ {
-      result.labelToAddress[std::string(one)] = ++currentMemoryAddress;
+      result.labelToAddress[std::string(one)] = currentMemoryAddress;
     }
   }
 
@@ -84,8 +83,9 @@ uint8_t createInstruction(int currentMemoryAddress, std::string_view instruction
   std::cout << "instruction=" << instruction << " operandOne=" << operandOne << " operandTwo=" << operandTwo << std::endl;
 
   if (instruction == "READ") {
-    const auto operandValue = isData(operandOne) ? (currentMemoryAddress - labelsAndData.dataToAddress.at(std::string(operandOne))) : static_cast<uint8_t>(std::stoi(std::string(operandOne)));
-    return setInstruction(Instruction::READ) | setValue(operandValue, 0, 5);
+    const int8_t operandValue = isData(operandOne) ? (labelsAndData.dataToAddress.at(std::string(operandOne)) - currentMemoryAddress) : static_cast<uint8_t>(std::stoi(std::string(operandOne)));
+    std::cout << "operandValue=" << int16_t(operandValue) << std::endl;
+    return setInstruction(Instruction::READ) | setSignedValue(operandValue, 0, 5);
   } else if (instruction == "LOAD") {
     return setInstruction(Instruction::LOAD) | setRegisters(getRegister(operandOne), getRegister(operandTwo));
   } else if (instruction == "STORE") {
@@ -95,8 +95,13 @@ uint8_t createInstruction(int currentMemoryAddress, std::string_view instruction
   } else if (instruction == "ADD") {
     return setInstruction(Instruction::ADD) | setRegisters(getRegister(operandOne), getRegister(operandTwo));
   } else if (instruction == "JG") {
-    const auto operandValue = isLabel(operandOne) ? (currentMemoryAddress - labelsAndData.labelToAddress.at(std::string(operandOne))) : static_cast<uint8_t>(std::stoi(std::string(operandOne)));
-    return setInstruction(Instruction::JG) | setValue(operandValue, 0, 5);
+    const int8_t operandValue = isLabel(operandOne) ? (labelsAndData.labelToAddress.at(std::string(operandOne)) - currentMemoryAddress) : static_cast<uint8_t>(std::stoi(std::string(operandOne)));
+    std::cout << "currentMemoryAddress=" << currentMemoryAddress << " creating jump to " << int16_t(operandValue) << std::endl;
+    const auto jumpInstruction = setInstruction(Instruction::JG) | setSignedValue(operandValue, 0, 5);
+
+    std::cout << "jumpInstruction=" << std::bitset<8>(jumpInstruction) << std::endl;
+
+    return jumpInstruction;
   } else if (instruction == "SYS") {
     const auto syscall = [&]() {
       if (operandOne == "PUTC") {
@@ -126,7 +131,9 @@ std::vector<uint8_t> generateMachineCode(
     }
 
     if (auto [one, two, three] = splitLine(line, ' '); isInstruction(one)) {
-      result.push_back(createInstruction(currentMemoryAddress++, one, two, three, labelsAndData));
+      const auto machineInstruction = createInstruction(currentMemoryAddress++, one, two, three, labelsAndData);
+      std::cout << "machineInstruction=" << uint16_t(machineInstruction) << std::endl;
+      result.push_back(machineInstruction);
     } else if (isData(one)) {
       const auto datum = isData(two) ? labelsAndData.dataToAddress.at(std::string(two)) : static_cast<uint8_t>(std::stoi(std::string(two)));
       result.push_back(datum);

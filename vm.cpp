@@ -5,6 +5,9 @@
 
 #include "shared.hpp"
 
+constexpr auto TOTAL_MEMORY_ADDRESSES = (1 << 8);
+constexpr auto TOTAL_REGISTER_COUNT = (1 << 2);
+
 enum class ConditionFlag {
   Negative,
   Zero,
@@ -17,17 +20,18 @@ struct SourceAndDestinations {
 };
 SourceAndDestinations getRegisterOperands(uint8_t rawInstruction)
 {
-  const auto destination = getValue(rawInstruction, 1, 2);
-  const auto source = getValue(rawInstruction, 3, 2);
+  const auto source = getValue(rawInstruction, 1, 2);
+  const auto destination = getValue(rawInstruction, 3, 2);
   return { source, destination };
 }
 
 void updateFlag(ConditionFlag& conditionalFlag, uint8_t registerValue)
 {
-  if (registerValue > 0) {
-    conditionalFlag = ConditionFlag::Positive;
-  } else if (registerValue < 0) {
+  const uint8_t negativeBitMask = 0b10000000;
+  if (registerValue & negativeBitMask) {
     conditionalFlag = ConditionFlag::Negative;
+  } else if (registerValue != 0) {
+    conditionalFlag = ConditionFlag::Positive;
   } else {
     conditionalFlag = ConditionFlag::Zero;
   }
@@ -69,15 +73,29 @@ void handleSystemCall(bool& running, uint8_t& r0, uint8_t rawInstruction)
   }
 }
 
+void dumpState(uint8_t memory[], uint8_t registers[], ConditionFlag& conditionalFlag)
+{
+  std::cout
+    << "["
+    << " R0=" << int16_t(registers[Register::R0])
+    << " R1=" << int16_t(registers[Register::R1])
+    << " R2=" << int16_t(registers[Register::R2])
+    << " PC=" << int16_t(registers[Register::ProgramControl])
+    << " ]"
+    << std::endl;
+}
+
 void handleNextInstruction(
   bool& running, uint8_t memory[], uint8_t registers[], ConditionFlag& conditionalFlag)
 {
   const auto rawInstruction = getRawInstruction(memory, registers[Register::ProgramControl]++);
   const auto operation = getOperation(rawInstruction);
+
   switch (operation) {
   case READ: {
-    const auto offset = getValue(rawInstruction, 0, 5);
+    const int8_t offset = getSignedValue(rawInstruction, 0, 5) - 1;
     registers[Register::R0] = memory[registers[Register::ProgramControl] + offset];
+    updateFlag(conditionalFlag, registers[Register::R0]);
     break;
   }
   case LOAD: {
@@ -106,7 +124,7 @@ void handleNextInstruction(
     break;
   }
   case JG: {
-    const auto programControlOffset = getValue(rawInstruction, 0, 5);
+    const int8_t programControlOffset = getSignedValue(rawInstruction, 0, 5) - 1;
     if (conditionalFlag == ConditionFlag::Positive) {
       registers[Register::ProgramControl] += programControlOffset;
     }
@@ -126,8 +144,6 @@ int main(int argc, const char** argv)
     return EXIT_FAILURE;
   }
 
-  constexpr auto TOTAL_MEMORY_ADDRESSES = (1 << 8);
-  constexpr auto TOTAL_REGISTER_COUNT = (1 << 2);
   uint8_t memory[TOTAL_MEMORY_ADDRESSES] = { 0 };
   uint8_t registers[TOTAL_REGISTER_COUNT] = { 0 };
   ConditionFlag conditionalFlag = ConditionFlag::Zero;
