@@ -17,13 +17,14 @@
     - **PUTC**: Output character value stored at r0 to stdout.
 
 ## TODO
-- [] Learning:
+- [x] Learning:
     - [x] Clarify how instructions work
+    - [] How to implement negatives
 - [] Write assembler
     - [] Parser
     - [] Bytecode Emitter
-- [] Write VM:
+- [x] Write VM:
     - [x] Main Loop
     - [x] Registers and Main Memory
-    - [] Traps
+    - [x] Traps
     - [x] Instructions
