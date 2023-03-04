@@ -17,6 +17,7 @@ enum Register {
 };
 
 enum Instruction {
+  READ,
   LOAD,
   STORE,
   COPY,
@@ -44,8 +45,8 @@ struct SourceAndDestinations {
 };
 SourceAndDestinations getRegisterOperands(int8_t rawInstruction)
 {
-  const auto source = getValue(rawInstruction, 1, 2);
-  const auto destination = getValue(rawInstruction, 3, 2);
+  const auto destination = getValue(rawInstruction, 1, 2);
+  const auto source = getValue(rawInstruction, 3, 2);
   return { source, destination };
 }
 
@@ -104,6 +105,12 @@ void handleNextInstruction(bool& running, int8_t memory[], int8_t registers[], C
   const auto rawInstruction = getRawInstruction(memory, registers[Register::ProgramControl]++);
   const auto operation = getOperation(rawInstruction);
   switch (operation) {
+  case READ: {
+    const auto destination = getValue(rawInstruction, 3, 2);
+    const auto offset = getValue(rawInstruction, 0, 3);
+    const auto value = registers[destination] = memory[registers[Register::ProgramControl] + offset];
+    break;
+  }
   case LOAD: {
     const auto [source, destination] = getRegisterOperands(rawInstruction);
     const auto sourceMemoryAddress = registers[source];

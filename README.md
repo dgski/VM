@@ -6,6 +6,7 @@
 - One PC (Program Control) Register
 
 ## Instruction Set
+- **READ x, y**: Load value at memory offset y (from currency Program Control) into register x.
 - **LOAD x, y**: Load value at memory address stored in register y into register x
 - **STORE x, y**: Write value in register y into memory address stored in register x
 - **COPY x, y**: Copy value in register y to register x
