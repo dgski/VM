@@ -87,7 +87,9 @@ Register getRegister(std::string_view name)
     return Register::R1;
   } else if (name == "R2") {
     return Register::R2;
-  } else {
+  } else if (name == "PC") {
     return Register::ProgramControl;
   }
+  
+  throw std::runtime_error("invalid register name");
 }
