@@ -7,5 +7,5 @@ project(cmake_test
 
 set (CMAKE_CXX_STANDARD 20)
 
-add_executable(assembler src/assembler.cpp)
-add_executable(vm src/vm.cpp)
+add_subdirectory(src/assembler)
+add_subdirectory(src/vm)
