@@ -12,7 +12,7 @@
 - **STORE x, y**: Write value in register y into memory address stored in register x (Indirect)
 - **COPY x, y**: Copy value in register y to register x
 - **ADD x, y**: Add value in register y to value in register x and store result in register x
-- **JG x**: Add offset of x to PC if previous instruction result result was greater than 0
+- **JG x**: Add offset of x to PC if previous instruction result was greater than 0
 - **SYS x**: Executes system call with id x. By convention R0 is used as an argument.
     - **HALT**: Stops the program
     - **PUTC**: Output character value stored at r0 to stdout.
