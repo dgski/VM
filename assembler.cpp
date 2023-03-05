@@ -151,17 +151,17 @@ std::vector<uint8_t> generateMachineCode(const char* inputAssemblyFilePath, cons
 int main(int argc, const char** argv)
 {
   if (argc != 3) {
-    std::cout << "invalid usage" << std::endl;
+    std::cout << "usage: ./assembler {inputAssemblyFilePath} {machineCodeOutputFilePath}" << std::endl;
     return EXIT_FAILURE;
   }
 
   const char* inputAssemblyFilePath = argv[1];
-  const char* bytecodeOutputFilePath = argv[2];
+  const char* machineCodeOutputFilePath = argv[2];
 
   const auto labelsAndData = getLabelsAndData(inputAssemblyFilePath);
   const auto machineCode = generateMachineCode(inputAssemblyFilePath, labelsAndData);
 
-  std::ofstream outputFile(bytecodeOutputFilePath, std::ios::out | std::ios::binary);
+  std::ofstream outputFile(machineCodeOutputFilePath, std::ios::out | std::ios::binary);
   for (auto byte : machineCode) {
     outputFile.put(byte);
   }

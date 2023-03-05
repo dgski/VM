@@ -46,7 +46,10 @@ void loadProgramFileIntoMemory(uint8_t memory[], const char* pathToProgramFile)
   }
 }
 
-uint8_t getRawInstruction(uint8_t memory[], uint8_t address) { return memory[address]; }
+uint8_t getRawInstruction(uint8_t memory[], uint8_t address)
+{
+  return memory[address];
+}
 
 Instruction getOperation(uint8_t rawInstruction)
 {
@@ -140,7 +143,7 @@ void handleNextInstruction(
 int main(int argc, const char** argv)
 {
   if (argc != 2) {
-    std::cout << "invalid usage" << std::endl;
+    std::cout << "usage: ./vm {pathToProgramFile}" << std::endl;
     return EXIT_FAILURE;
   }
 
