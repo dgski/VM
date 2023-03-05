@@ -7,7 +7,7 @@
 - 16 Address Jump/Read Limitation
 
 ## Instruction Set
-- **READ x, y**: Load value at memory offset y (from currency Program Control) into r0.
+- **READ y**: Load value at memory offset y (from current Program Control) into r0.
 - **LOAD x, y**: Load value at memory address stored in register y into register x (Indirect)
 - **STORE x, y**: Write value in register y into memory address stored in register x (Indirect)
 - **COPY x, y**: Copy value in register y to register x
