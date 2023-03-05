@@ -6,6 +6,11 @@
 
 #include "shared.hpp"
 
+bool isWhitespace(char c)
+{
+  return (c == ' ') || (c == '\t');
+}
+
 struct SplitLine {
   std::string_view one;
   std::string_view two;
@@ -16,6 +21,10 @@ SplitLine splitLine(std::string_view line, char delimeter)
   SplitLine result;
 
   const auto getNextToken = [](std::string_view& output, std::string_view& input) {
+    while (!input.empty() && isWhitespace(input.front())) {
+      input.remove_prefix(1);
+    }
+
     if (input.empty()) {
       return;
     }
