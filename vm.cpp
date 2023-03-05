@@ -83,13 +83,18 @@ void handleSystemCall(bool& running, uint8_t& r0, uint8_t rawInstruction)
 void dumpState(uint8_t memory[], uint8_t registers[], ConditionFlag& conditionalFlag)
 {
   std::cout
-    << "["
+    << "registers=["
     << " R0=" << int16_t(registers[Register::R0])
     << " R1=" << int16_t(registers[Register::R1])
     << " R2=" << int16_t(registers[Register::R2])
     << " PC=" << int16_t(registers[Register::ProgramControl])
-    << " ]"
-    << std::endl;
+    << " ] ";
+  
+  std::cout << "memory=[ ";
+  for (int i=0; i<TOTAL_MEMORY_ADDRESSES; ++i) {
+    std::cout << i << ':' << int(memory[i]) << ' ';
+  }
+  std::cout << "]" << std::endl;
 }
 
 void handleNextInstruction(
@@ -161,6 +166,7 @@ int main(int argc, const char** argv)
 
   bool running = true;
   while (running) {
+    //dumpState(memory, registers, conditionalFlag);
     handleNextInstruction(running, memory, registers, conditionalFlag);
   }
 
