@@ -23,19 +23,23 @@ START
         READ .INC
         JG LOOP
 END
+    READ .SKIP
+    JG PRINTDONE
+    .SKIP 1
     .D 68
-    READ .D
-    SYS PUTC
     .O 79
-    READ .O
-    SYS PUTC
     .N 78
-    READ .N
-    SYS PUTC
     .E 69
-    READ .E
-    SYS PUTC
-    .NEWLINE 10
-    READ .NEWLINE
-    SYS PUTC
-SYS HALT
+    PRINTDONE
+        READ .D
+        SYS PUTC
+        READ .O
+        SYS PUTC
+        READ .N
+        SYS PUTC
+        READ .E
+        SYS PUTC
+        .NEWLINE 10
+        READ .NEWLINE
+        SYS PUTC
+    SYS HALT
