@@ -1,12 +1,12 @@
 #pragma once
 
-#include <bitset>
+#include <stdexcept>
 
 enum Register {
   R0,
   R1,
   R2,
-  ProgramControl
+  PC
 };
 
 enum Instruction {
@@ -88,7 +88,7 @@ Register getRegister(std::string_view name)
   } else if (name == "R2") {
     return Register::R2;
   } else if (name == "PC") {
-    return Register::ProgramControl;
+    return Register::PC;
   }
   
   throw std::runtime_error("invalid register name");
