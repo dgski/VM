@@ -21,7 +21,8 @@ enum Instruction {
 
 enum SystemCalls {
   HALT,
-  PUTC
+  PUTC,
+  GETC
 };
 
 bool isNegative(uint8_t value, int widthInBits)
@@ -65,15 +66,7 @@ uint8_t setValue(uint8_t value, int bit, int widthInBits)
 
 uint8_t setSignedValue(int8_t value, int bit, int widthInBits)
 {
-  std::cout << "setting signed value " << std::bitset<8>(value) << std::endl;
-
-  const uint8_t mask = (~(~uint8_t(0) << widthInBits) << bit);
-  value <<= bit;
-  value &= mask;
-
-  std::cout << "final value " << std::bitset<8>(value) << std::endl;
-
-  return value;
+  return setValue(value, bit, widthInBits);
 }
 
 uint8_t setInstruction(uint8_t instruction)

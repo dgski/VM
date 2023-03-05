@@ -73,6 +73,10 @@ void handleSystemCall(bool& running, uint8_t& r0, uint8_t rawInstruction)
     std::cout << r0;
     break;
   }
+  case GETC: {
+    std::cin >> r0;
+    break;
+  }
   }
 }
 
@@ -135,6 +139,7 @@ void handleNextInstruction(
   }
   case SYS: {
     handleSystemCall(running, registers[Register::R0], rawInstruction);
+    updateFlag(conditionalFlag, registers[Register::R0]);
     break;
   }
   }

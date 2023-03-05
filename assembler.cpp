@@ -112,7 +112,15 @@ uint8_t createInstruction(
     const auto jumpInstruction = setInstruction(Instruction::JG) | setSignedValue(operandValue, 0, 5);
     return jumpInstruction;
   } else if (instruction == "SYS") {
-    const auto syscall = (operandOne == "PUTC") ? SystemCalls::PUTC : SystemCalls::HALT;
+    const auto syscall = [operandOne]() {
+      if (operandOne == "PUTC") {
+        return SystemCalls::PUTC;
+      } else if (operandOne == "GETC") {
+        return SystemCalls::GETC;
+      } else {
+        return SystemCalls::HALT;
+      }
+    }();
     return setInstruction(Instruction::SYS) | setValue(syscall, 0, 5);
   }
 
