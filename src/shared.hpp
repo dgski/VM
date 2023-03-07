@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdexcept>
+#include <string_view>
 
 enum Register {
   R0,
@@ -90,6 +91,6 @@ Register getRegister(std::string_view name)
   } else if (name == "PC") {
     return Register::PC;
   }
-  
+
   throw std::runtime_error("invalid register name");
 }
