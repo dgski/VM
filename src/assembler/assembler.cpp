@@ -6,6 +6,21 @@
 
 #include "../shared.hpp"
 
+std::vector<std::string> getLinesFromFile(const char* filePath)
+{
+  std::vector<std::string> result;
+  std::string line;
+  std::ifstream assemblyFileStream(filePath);
+  while (std::getline(assemblyFileStream, line)) {
+    if (line.empty()) {
+      continue;
+    }
+    result.push_back(line);
+  }
+
+  return result;
+}
+
 bool isWhitespace(char c)
 {
   return (c == ' ') || (c == '\t');
@@ -70,18 +85,12 @@ struct LabelsAndData {
   std::unordered_map<std::string, int> labelToAddress;
   std::unordered_map<std::string, int> dataToAddress;
 };
-LabelsAndData getLabelsAndData(const char* inputAssemblyFilePath)
+LabelsAndData getLabelsAndData(const std::vector<std::string>& lines)
 {
   LabelsAndData result;
 
   int currentMemoryAddress = 0;
-  std::string line;
-  std::ifstream assemblyFileStream(inputAssemblyFilePath);
-  while (std::getline(assemblyFileStream, line)) {
-    if (line.empty()) {
-      continue;
-    }
-
+  for (const auto& line : lines) {
     if (auto [one, two, three] = splitLine(line, ' '); isInstruction(one)) {
       ++currentMemoryAddress;
     } else if (isData(one)) {
@@ -136,18 +145,12 @@ uint8_t createInstruction(
   return 0;
 }
 
-std::vector<uint8_t> generateMachineCode(const char* inputAssemblyFilePath, const LabelsAndData& labelsAndData)
+std::vector<uint8_t> generateMachineCode(const std::vector<std::string>& lines, const LabelsAndData& labelsAndData)
 {
   std::vector<uint8_t> result;
 
   int currentMemoryAddress = 0;
-  std::string line;
-  std::ifstream assemblyFileStream(inputAssemblyFilePath);
-  while (std::getline(assemblyFileStream, line)) {
-    if (line.empty()) {
-      continue;
-    }
-
+  for (const auto& line : lines) {
     if (auto [one, two, three] = splitLine(line, ' '); isInstruction(one)) {
       const auto machineInstruction = createInstruction(currentMemoryAddress++, one, two, three, labelsAndData);
       result.push_back(machineInstruction);
@@ -175,8 +178,10 @@ int main(int argc, const char** argv)
   const char* inputAssemblyFilePath = argv[1];
   const char* machineCodeOutputFilePath = argv[2];
 
-  const auto labelsAndData = getLabelsAndData(inputAssemblyFilePath);
-  const auto machineCode = generateMachineCode(inputAssemblyFilePath, labelsAndData);
+  const auto lines = getLinesFromFile(inputAssemblyFilePath);
+
+  const auto labelsAndData = getLabelsAndData(lines);
+  const auto machineCode = generateMachineCode(lines, labelsAndData);
 
   std::ofstream outputFile(machineCodeOutputFilePath, std::ios::out | std::ios::binary);
   for (auto byte : machineCode) {
