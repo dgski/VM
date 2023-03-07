@@ -168,6 +168,14 @@ std::vector<uint8_t> generateMachineCode(const std::vector<std::string>& lines, 
   return result;
 }
 
+void writeToBinaryFile(const char* machineCodeOutputFilePath, const std::vector<uint8_t>& machineCode)
+{
+  std::ofstream outputFile(machineCodeOutputFilePath, std::ios::out | std::ios::binary);
+  for (auto byte : machineCode) {
+    outputFile.put(byte);
+  }
+}
+
 int main(int argc, const char** argv)
 {
   if (argc != 3) {
@@ -183,10 +191,7 @@ int main(int argc, const char** argv)
   const auto labelsAndData = getLabelsAndData(lines);
   const auto machineCode = generateMachineCode(lines, labelsAndData);
 
-  std::ofstream outputFile(machineCodeOutputFilePath, std::ios::out | std::ios::binary);
-  for (auto byte : machineCode) {
-    outputFile.put(byte);
-  }
+  writeToBinaryFile(machineCodeOutputFilePath, machineCode);
 
   return EXIT_SUCCESS;
 }
