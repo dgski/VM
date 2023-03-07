@@ -187,10 +187,8 @@ int main(int argc, const char** argv)
   const char* machineCodeOutputFilePath = argv[2];
 
   const auto lines = getLinesFromFile(inputAssemblyFilePath);
-
   const auto labelsAndData = getLabelsAndData(lines);
   const auto machineCode = generateMachineCode(lines, labelsAndData);
-
   writeToBinaryFile(machineCodeOutputFilePath, machineCode);
 
   return EXIT_SUCCESS;
