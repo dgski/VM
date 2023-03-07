@@ -104,49 +104,49 @@ void handleNextInstruction(
   const auto operation = getOperation(rawInstruction);
 
   switch (operation) {
-  case READ: {
-    const int8_t offset = getSignedValue(rawInstruction, 0, 5) - 1;
-    registers[Register::R0] = memory[registers[Register::PC] + offset];
-    updateFlag(conditionalFlag, registers[Register::R0]);
-    break;
-  }
-  case LOAD: {
-    const auto [source, destination] = getRegisterOperands(rawInstruction);
-    const auto sourceMemoryAddress = registers[source];
-    registers[destination] = memory[sourceMemoryAddress];
-    updateFlag(conditionalFlag, registers[destination]);
-    break;
-  }
-  case STORE: {
-    const auto [source, destination] = getRegisterOperands(rawInstruction);
-    const auto destinationMemoryAddress = registers[destination];
-    memory[destinationMemoryAddress] = registers[source];
-    break;
-  }
-  case COPY: {
-    const auto [source, destination] = getRegisterOperands(rawInstruction);
-    registers[destination] = registers[source];
-    updateFlag(conditionalFlag, registers[destination]);
-    break;
-  }
-  case ADD: {
-    const auto [source, destination] = getRegisterOperands(rawInstruction);
-    registers[destination] += int8_t(registers[source]);
-    updateFlag(conditionalFlag, registers[destination]);
-    break;
-  }
-  case JG: {
-    const int8_t programControlOffset = getSignedValue(rawInstruction, 0, 5) - 1;
-    if (conditionalFlag == ConditionFlag::Positive) {
-      registers[Register::PC] += programControlOffset;
+    case READ: {
+      const int8_t offset = getSignedValue(rawInstruction, 0, 5) - 1;
+      registers[Register::R0] = memory[registers[Register::PC] + offset];
+      updateFlag(conditionalFlag, registers[Register::R0]);
+      break;
     }
-    break;
-  }
-  case SYS: {
-    handleSystemCall(running, registers[Register::R0], rawInstruction);
-    updateFlag(conditionalFlag, registers[Register::R0]);
-    break;
-  }
+    case LOAD: {
+      const auto [source, destination] = getRegisterOperands(rawInstruction);
+      const auto sourceMemoryAddress = registers[source];
+      registers[destination] = memory[sourceMemoryAddress];
+      updateFlag(conditionalFlag, registers[destination]);
+      break;
+    }
+    case STORE: {
+      const auto [source, destination] = getRegisterOperands(rawInstruction);
+      const auto destinationMemoryAddress = registers[destination];
+      memory[destinationMemoryAddress] = registers[source];
+      break;
+    }
+    case COPY: {
+      const auto [source, destination] = getRegisterOperands(rawInstruction);
+      registers[destination] = registers[source];
+      updateFlag(conditionalFlag, registers[destination]);
+      break;
+    }
+    case ADD: {
+      const auto [source, destination] = getRegisterOperands(rawInstruction);
+      registers[destination] += int8_t(registers[source]);
+      updateFlag(conditionalFlag, registers[destination]);
+      break;
+    }
+    case JG: {
+      const int8_t programControlOffset = getSignedValue(rawInstruction, 0, 5) - 1;
+      if (conditionalFlag == ConditionFlag::Positive) {
+        registers[Register::PC] += programControlOffset;
+      }
+      break;
+    }
+    case SYS: {
+      handleSystemCall(running, registers[Register::R0], rawInstruction);
+      updateFlag(conditionalFlag, registers[Register::R0]);
+      break;
+    }
   }
 }
 
@@ -166,7 +166,6 @@ int main(int argc, const char** argv)
 
   bool running = true;
   while (running) {
-    //dumpState(memory, registers, conditionalFlag);
     handleNextInstruction(running, memory, registers, conditionalFlag);
   }
 
